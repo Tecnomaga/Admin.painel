@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gram Catcher Admin</title>
+    <style>
+        body { background: #1a1f2e; color: #e0e8f0; font-family: sans-serif; padding: 20px; }
+        h1 { color: #f4c542; }
+        .container { max-width: 600px; margin: 0 auto; }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        button { background: #d94040; border: none; color: white; font-weight: bold; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #4a5a7e; padding: 8px; text-align: left; }
+        th { background: #2a3a4e; }
+        .status { font-weight: bold; }
+        .actions button { margin-right: 5px; width: auto; }
+        .pending { color: #f4c542; }
+        .approved { color: #5a9c3f; }
+        .rejected { color: #e0434f; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gram Catcher Admin</h1>
+        <div>
+            <input type="password" id="adminKey" placeholder="Chave de administrador" />
+            <button onclick="login()">Login</button>
+        </div>
+        <div id="panel" style="display:none;">
+            <button onclick="loadTransactions()">Atualizar</button>
+            <table id="txTable">
+                <thead>
+                    <tr>
+                        <th>Telegram ID</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                        <th>Hash / Carteira</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://gramcatcher-back-end.onrender.com';
+        let adminKey = '';
+
+        function login() {
+            adminKey = document.getElementById('adminKey').value;
+            if (!adminKey) return alert('Chave obrigatória');
+            loadTransactions();
+            document.getElementById('panel').style.display = 'block';
+        }
+
+        async function loadTransactions() {
+            try {
+                const res = await fetch(`${API_URL}/api/admin/transactions`, {
+                    headers: { 'x-admin-key': adminKey }
+                });
+                const transactions = await res.json();
+                renderTable(transactions);
+            } catch (e) {
+                alert('Erro ao carregar transações');
+            }
+        }
+
+        function renderTable(transactions) {
+            const tbody = document.querySelector('#txTable tbody');
+            tbody.innerHTML = '';
+            transactions.forEach(tx => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${tx.telegramId}</td>
+                    <td>${tx.type === 'deposit' ? 'Depósito' : 'Saque'}</td>
+                    <td>${tx.amount.toFixed(2)}</td>
+                    <td>${tx.txHash || tx.walletAddress || '-'}</td>
+                    <td class="status ${tx.status}">${tx.status}</td>
+                    <td class="actions">
+                        <button onclick="processTx('${tx._id}', 'approved')">Aprovar</button>
+                        <button onclick="processTx('${tx._id}', 'rejected')">Rejeitar</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function processTx(id, status) {
+            try {
+                const res = await fetch(`${API_URL}/api/admin/transaction/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-admin-key': adminKey
+                    },
+                    body: JSON.stringify({ status })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert(`Transação ${status === 'approved' ? 'aprovada' : 'rejeitada'} com sucesso`);
+                    loadTransactions();
+                } else {
+                    alert(data.error || 'Erro ao processar');
+                }
+            } catch (e) {
+                alert('Erro de conexão');
+            }
+        }
+    </script>
+</body>
+</html>
