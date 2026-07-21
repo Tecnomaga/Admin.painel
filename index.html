@@ -10,7 +10,7 @@
             display: flex; justify-content: center; align-items: center; min-height: 100vh;
             margin: 0; padding: 20px;
         }
-        .container { max-width: 600px; width: 100%; }
+        .container { max-width: 700px; width: 100%; }
         h1 { color: #f4c542; text-align: center; }
         .login-box, .panel {
             background: #2a3040; border: 2px solid #4a5a7e; padding: 20px;
@@ -43,7 +43,6 @@
     <div class="container">
         <h1>Gram Catcher Admin</h1>
 
-        <!-- Tela de login -->
         <div id="loginScreen" class="login-box">
             <h3>Login</h3>
             <input type="text" id="username" placeholder="Usuário" />
@@ -52,7 +51,6 @@
             <p class="error" id="loginError"></p>
         </div>
 
-        <!-- Painel (oculto até login) -->
         <div id="panel" class="panel" style="display:none;">
             <div class="logout"><a onclick="logout()">Sair</a></div>
             <button onclick="loadTransactions()">Atualizar transações</button>
@@ -60,6 +58,7 @@
             <table id="txTable">
                 <thead>
                     <tr>
+                        <th>Jogador</th>
                         <th>Telegram ID</th>
                         <th>Tipo</th>
                         <th>Valor</th>
@@ -84,9 +83,7 @@
                 document.getElementById('loginError').textContent = 'Preencha todos os campos.';
                 return;
             }
-            // A senha é a ADMIN_KEY
             adminKey = pass;
-            // Testa a conexão carregando transações
             loadTransactions(true);
         }
 
@@ -102,7 +99,6 @@
                     throw new Error(data.error || `Erro ${res.status}`);
                 }
                 const transactions = await res.json();
-                // Login bem-sucedido
                 if (isLogin) {
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('panel').style.display = 'block';
@@ -110,9 +106,7 @@
                 renderTable(transactions);
             } catch (e) {
                 errorEl.textContent = e.message;
-                if (isLogin) {
-                    adminKey = ''; // limpa se falhou
-                }
+                if (isLogin) adminKey = '';
             }
         }
 
@@ -120,12 +114,13 @@
             const tbody = document.querySelector('#txTable tbody');
             tbody.innerHTML = '';
             if (!transactions || transactions.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6">Nenhuma transação pendente.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7">Nenhuma transação pendente.</td></tr>';
                 return;
             }
             transactions.forEach(tx => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
+                    <td>${tx.username || '-'}</td>
                     <td>${tx.telegramId}</td>
                     <td>${tx.type === 'deposit' ? 'Depósito' : 'Saque'}</td>
                     <td>${tx.amount.toFixed(2)}</td>
@@ -153,7 +148,7 @@
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Erro ao processar');
-                alert('Transação processada com sucesso!');
+                alert('Transação processada!');
                 loadTransactions();
             } catch (e) {
                 alert(e.message);
