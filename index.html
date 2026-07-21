@@ -240,7 +240,6 @@
     <!-- Tela de login -->
     <div id="loginScreen" class="login-box">
         <h3>🔐 Acesso Administrativo</h3>
-        <input type="text" id="username" placeholder="Usuário" />
         <input type="password" id="password" placeholder="Senha administrativa" />
         <button onclick="doLogin()" class="gold">Entrar</button>
         <p class="error" id="loginError"></p>
@@ -288,74 +287,73 @@
 
 <script>
     const API_URL = 'https://gramcatcher-back-end.onrender.com';
-    let adminKey = '';
+    let authToken = localStorage.getItem('gramcatcher_admin_token') || '';
 
-    // ========== LOGIN PERSISTENTE ==========
-    window.addEventListener('load', () => {
-        const savedKey = localStorage.getItem('gramcatcher_admin_key');
-        if (savedKey) {
-            adminKey = savedKey;
-            loadTransactions(true);
-        }
-    });
-
-    function doLogin() {
-        const user = document.getElementById('username').value.trim();
+    // ========== LOGIN ==========
+    async function doLogin() {
         const pass = document.getElementById('password').value.trim();
-        if (!user || !pass) {
-            document.getElementById('loginError').textContent = 'Preencha todos os campos.';
+        if (!pass) {
+            document.getElementById('loginError').textContent = 'Digite a senha.';
             return;
         }
-        adminKey = pass;
-        localStorage.setItem('gramcatcher_admin_key', pass);
-        loadTransactions(true);
+        try {
+            const res = await fetch(`${API_URL}/api/admin/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: pass })
+            });
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Falha na autenticação');
+            }
+            const data = await res.json();
+            authToken = data.token;
+            localStorage.setItem('gramcatcher_admin_token', authToken);
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('panel').style.display = 'block';
+            loadTransactions();
+        } catch (e) {
+            document.getElementById('loginError').textContent = e.message;
+        }
     }
 
     function logout() {
-        adminKey = '';
-        localStorage.removeItem('gramcatcher_admin_key');
+        authToken = '';
+        localStorage.removeItem('gramcatcher_admin_token');
         document.getElementById('loginScreen').style.display = 'block';
         document.getElementById('panel').style.display = 'none';
-        document.getElementById('username').value = '';
         document.getElementById('password').value = '';
     }
 
     // ========== CARREGAR TRANSAÇÕES ==========
-    async function loadTransactions(isLogin = false, searchTerm = '') {
-        const errorEl = document.getElementById(isLogin ? 'loginError' : 'txError');
+    async function loadTransactions(searchTerm = '') {
+        const errorEl = document.getElementById('txError');
         errorEl.textContent = '';
-        
+        if (!authToken) {
+            logout();
+            return;
+        }
         try {
             let url = `${API_URL}/api/admin/transactions`;
             if (searchTerm) {
                 url += `?search=${encodeURIComponent(searchTerm)}`;
             }
-            
             const res = await fetch(url, {
-                headers: { 'x-admin-key': adminKey }
+                headers: { 'Authorization': `Bearer ${authToken}` }
             });
-            
+            if (res.status === 403) {
+                logout();
+                throw new Error('Sessão expirada. Faça login novamente.');
+            }
             if (!res.ok) {
                 const data = await res.json();
                 throw new Error(data.error || `Erro ${res.status}`);
             }
-            
             const transactions = await res.json();
-            
-            if (isLogin) {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('panel').style.display = 'block';
-            }
-            
             renderTable(transactions);
             document.getElementById('pendingCount').textContent = transactions.length;
-            
         } catch (e) {
             errorEl.textContent = e.message;
-            if (isLogin) {
-                adminKey = '';
-                localStorage.removeItem('gramcatcher_admin_key');
-            }
         }
     }
 
@@ -372,7 +370,7 @@
             loadTransactions();
             return;
         }
-        loadTransactions(false, term);
+        loadTransactions(term);
     }
 
     function clearSearch() {
@@ -385,14 +383,14 @@
         const tbody = document.querySelector('#txTable tbody');
         const noResults = document.getElementById('noResults');
         tbody.innerHTML = '';
-        
+
         if (!transactions || transactions.length === 0) {
             noResults.style.display = 'block';
             return;
         }
-        
+
         noResults.style.display = 'none';
-        
+
         transactions.forEach(tx => {
             const date = new Date(tx.createdAt).toLocaleString('pt-BR', {
                 day: '2-digit',
@@ -401,7 +399,7 @@
                 hour: '2-digit',
                 minute: '2-digit'
             });
-            
+
             const isDeposit = tx.type === 'deposit';
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -425,29 +423,53 @@
     async function processTx(id, status) {
         const action = status === 'approved' ? 'APROVAR' : 'REJEITAR';
         if (!confirm(`⚠️ Confirmar ${action} esta transação?`)) return;
-        
+
         try {
             const res = await fetch(`${API_URL}/api/admin/transaction/${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-admin-key': adminKey
+                    'Authorization': `Bearer ${authToken}`
                 },
                 body: JSON.stringify({ status })
             });
-            
+
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Erro ao processar');
-            
+
             alert(`✅ Transação ${status === 'approved' ? 'aprovada' : 'rejeitada'} com sucesso!`);
-            
+
             const searchTerm = document.getElementById('searchInput').value.trim();
-            loadTransactions(false, searchTerm);
-            
+            loadTransactions(searchTerm);
+
         } catch (e) {
             alert('❌ ' + e.message);
         }
     }
+
+    // ========== VERIFICA LOGIN AO CARREGAR ==========
+    window.addEventListener('load', () => {
+        if (authToken) {
+            // Testa se o token ainda é válido fazendo uma requisição silenciosa
+            fetch(`${API_URL}/api/admin/transactions`, {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            }).then(res => {
+                if (res.ok) {
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('panel').style.display = 'block';
+                    loadTransactions();
+                } else {
+                    // Token inválido ou expirado
+                    logout();
+                }
+            }).catch(() => {
+                // Erro de rede, mantém logado mas pode falhar depois
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('panel').style.display = 'block';
+                loadTransactions();
+            });
+        }
+    });
 </script>
 </body>
 </html>
