@@ -11,7 +11,6 @@
             --font: 'Press Start 2P', cursive;
             --bg-dark: #0a1020;
             --bg-panel: #1a1f2e;
-            --bg-modal: #1e2e42;
             --text-primary: #ffffff;
             --text-secondary: #dde;
             --green: #5a9c3f;
@@ -34,19 +33,8 @@
             position: fixed; inset: 0; pointer-events: none; z-index: 0;
             background: radial-gradient(ellipse at center, #0a1628 0%, #06080d 70%);
         }
-        .starfield::before {
-            content: ''; position: absolute; inset: 0;
-            background-image: 
-                radial-gradient(1px 1px at 20% 30%, #fff8, transparent),
-                radial-gradient(1px 1px at 50% 60%, #fff6, transparent),
-                radial-gradient(1.5px 1.5px at 70% 20%, #fff9, transparent),
-                radial-gradient(1px 1px at 90% 10%, #fff7, transparent),
-                radial-gradient(1.5px 1.5px at 40% 80%, #fff5, transparent);
-            animation: twinkle 4s infinite alternate;
-        }
-        @keyframes twinkle { 0%{opacity:0.6} 50%{opacity:1} 100%{opacity:0.7} }
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             width: 100%;
             position: relative;
             z-index: 1;
@@ -54,7 +42,7 @@
         h1 {
             color: var(--gold);
             text-align: center;
-            font-size: 1.2rem;
+            font-size: 1rem;
             text-shadow: 4px 4px 0 #000;
             margin-bottom: 20px;
             letter-spacing: 2px;
@@ -73,7 +61,7 @@
             margin-bottom: 20px;
             text-align: center;
         }
-        input, button, select {
+        input, button {
             padding: 14px 16px;
             margin: 8px 0;
             width: 100%;
@@ -100,36 +88,12 @@
             box-shadow: 3px 3px 0 #000;
             transition: all 0.1s;
         }
-        button:hover {
-            background: #c03030;
-        }
-        button:active {
-            box-shadow: 1px 1px 0 #000;
-            transform: translate(2px,2px);
-        }
-        button.gold {
-            background: linear-gradient(180deg, var(--gold), #a07808);
-            border-color: #7a5800;
-            color: #1a1a20;
-        }
-        button.green {
-            background: linear-gradient(180deg, var(--green), #2d6a20);
-            border-color: #1a4a10;
-        }
-        button.small {
-            width: auto;
-            padding: 8px 14px;
-            font-size: 0.55rem;
-        }
-        .error {
-            color: #e0434f;
-            font-size: 0.55rem;
-            margin-top: 5px;
-        }
-        .success {
-            color: var(--green);
-            font-size: 0.55rem;
-        }
+        button:hover { background: #c03030; }
+        button:active { box-shadow: 1px 1px 0 #000; transform: translate(2px,2px); }
+        button.gold { background: linear-gradient(180deg, var(--gold), #a07808); border-color: #7a5800; color: #1a1a20; }
+        button.green { background: linear-gradient(180deg, var(--green), #2d6a20); border-color: #1a4a10; }
+        button.small { width: auto; padding: 8px 14px; font-size: 0.55rem; }
+        .error { color: #e0434f; font-size: 0.55rem; margin-top: 5px; }
         .logout {
             display: flex;
             justify-content: space-between;
@@ -138,15 +102,8 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        .logout a {
-            color: #aaccff;
-            cursor: pointer;
-            text-decoration: underline;
-            font-size: 0.55rem;
-        }
-        .logout a:hover {
-            color: #fff;
-        }
+        .logout a { color: #aaccff; cursor: pointer; text-decoration: underline; font-size: 0.55rem; }
+        .logout a:hover { color: #fff; }
         .search-box {
             display: flex;
             gap: 10px;
@@ -166,33 +123,58 @@
             padding: 12px 18px;
             font-size: 0.6rem;
         }
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-top: 15px;
-            font-size: 0.55rem;
-            overflow-x: auto;
-            display: block;
-        }
-        th {
-            background: #2a3a4e;
-            padding: 12px 8px;
-            text-align: left;
+        .count-badge {
+            display: inline-block;
+            background: var(--gold);
+            color: #000;
+            padding: 4px 10px;
             font-size: 0.5rem;
+            margin-left: 8px;
+        }
+        .tx-card {
+            background: #1a2a3a;
+            border: 2px solid #3a4a5e;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            font-size: 0.45rem;
+            line-height: 1.8;
+        }
+        .tx-card .tx-header {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
             color: var(--gold);
-            white-space: nowrap;
         }
-        td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #3a4a5e;
-            white-space: nowrap;
-            font-size: 0.5rem;
+        .tx-card .tx-row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 2px 0;
         }
-        tr:hover td {
-            background: rgba(255,255,255,0.03);
+        .tx-card .tx-label {
+            color: #aaa;
+            font-size: 0.4rem;
         }
-        .status {
+        .tx-card .tx-value {
+            color: #fff;
+            word-break: break-all;
+            text-align: right;
+            max-width: 60%;
+        }
+        .tx-card .tx-hash {
+            color: #aaccff;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 0.4rem;
+            background: #0a1520;
+            padding: 6px;
+            border-radius: 4px;
+            margin: 4px 0;
+            line-height: 1.4;
+        }
+        .tx-card .status {
             font-weight: bold;
             text-transform: uppercase;
             font-size: 0.45rem;
@@ -202,11 +184,13 @@
         .status.rejected { color: #e0434f; }
         .actions {
             display: flex;
-            gap: 6px;
+            gap: 8px;
+            margin-top: 10px;
+            flex-wrap: wrap;
         }
         .actions button {
-            padding: 6px 12px;
-            font-size: 0.45rem;
+            padding: 8px 14px;
+            font-size: 0.5rem;
             margin: 0;
             width: auto;
         }
@@ -216,19 +200,9 @@
             color: #aaa;
             font-size: 0.55rem;
         }
-        .count-badge {
-            display: inline-block;
-            background: var(--gold);
-            color: #000;
-            padding: 4px 10px;
-            font-size: 0.5rem;
-            margin-left: 8px;
-        }
         @media (max-width: 600px) {
-            table { font-size: 0.45rem; }
-            th, td { padding: 8px 6px; }
-            .actions button { padding: 5px 8px; font-size: 0.4rem; }
-            h1 { font-size: 1rem; }
+            h1 { font-size: 0.8rem; }
+            .tx-card .tx-value { max-width: 100%; text-align: left; }
         }
     </style>
 </head>
@@ -237,7 +211,6 @@
 <div class="container">
     <h1>🎮 Gram Catcher Admin</h1>
 
-    <!-- Tela de login -->
     <div id="loginScreen" class="login-box">
         <h3>🔐 Acesso Administrativo</h3>
         <input type="password" id="password" placeholder="Senha administrativa" />
@@ -245,7 +218,6 @@
         <p class="error" id="loginError"></p>
     </div>
 
-    <!-- Painel (oculto até login) -->
     <div id="panel" class="panel" style="display:none;">
         <div class="logout">
             <span style="font-size:0.5rem;">🔐 Admin Logado</span>
@@ -264,23 +236,7 @@
             Transações pendentes: <span id="pendingCount" class="count-badge">0</span>
         </p>
 
-        <div style="overflow-x:auto;">
-            <table id="txTable">
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Jogador</th>
-                        <th>ID</th>
-                        <th>Tipo</th>
-                        <th>Valor</th>
-                        <th>Hash / Carteira</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+        <div id="txList"></div>
         <div class="no-results" id="noResults" style="display:none;">Nenhuma transação encontrada.</div>
     </div>
 </div>
@@ -289,32 +245,22 @@
     const API_URL = 'https://gramcatcher-back-end.onrender.com';
     let authToken = localStorage.getItem('gramcatcher_admin_token') || '';
 
-    // ========== LOGIN ==========
     async function doLogin() {
         const pass = document.getElementById('password').value.trim();
-        if (!pass) {
-            document.getElementById('loginError').textContent = 'Digite a senha.';
-            return;
-        }
+        if (!pass) { document.getElementById('loginError').textContent = 'Digite a senha.'; return; }
         try {
             const res = await fetch(`${API_URL}/api/admin/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password: pass })
             });
-            if (!res.ok) {
-                const err = await res.json();
-                throw new Error(err.error || 'Falha na autenticação');
-            }
+            if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Falha na autenticação'); }
             const data = await res.json();
             authToken = data.token;
             localStorage.setItem('gramcatcher_admin_token', authToken);
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('panel').style.display = 'block';
             loadTransactions();
-        } catch (e) {
-            document.getElementById('loginError').textContent = e.message;
-        }
+        } catch (e) { document.getElementById('loginError').textContent = e.message; }
     }
 
     function logout() {
@@ -325,145 +271,107 @@
         document.getElementById('password').value = '';
     }
 
-    // ========== CARREGAR TRANSAÇÕES ==========
     async function loadTransactions(searchTerm = '') {
         const errorEl = document.getElementById('txError');
         errorEl.textContent = '';
-        if (!authToken) {
-            logout();
-            return;
-        }
+        if (!authToken) { logout(); return; }
         try {
             let url = `${API_URL}/api/admin/transactions`;
-            if (searchTerm) {
-                url += `?search=${encodeURIComponent(searchTerm)}`;
-            }
-            const res = await fetch(url, {
-                headers: { 'Authorization': `Bearer ${authToken}` }
-            });
-            if (res.status === 403) {
-                logout();
-                throw new Error('Sessão expirada. Faça login novamente.');
-            }
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.error || `Erro ${res.status}`);
-            }
+            if (searchTerm) url += `?search=${encodeURIComponent(searchTerm)}`;
+            const res = await fetch(url, { headers: { 'Authorization': `Bearer ${authToken}` } });
+            if (res.status === 403) { logout(); throw new Error('Sessão expirada.'); }
+            if (!res.ok) { const data = await res.json(); throw new Error(data.error || `Erro ${res.status}`); }
             const transactions = await res.json();
-            renderTable(transactions);
+            renderList(transactions);
             document.getElementById('pendingCount').textContent = transactions.length;
-        } catch (e) {
-            errorEl.textContent = e.message;
-        }
+        } catch (e) { errorEl.textContent = e.message; }
     }
 
-    // ========== PESQUISA ==========
-    function handleSearchKey(e) {
-        if (e.key === 'Enter') {
-            searchTransactions();
-        }
-    }
+    function handleSearchKey(e) { if (e.key === 'Enter') searchTransactions(); }
+    function searchTransactions() { const term = document.getElementById('searchInput').value.trim(); if (!term) { loadTransactions(); return; } loadTransactions(term); }
+    function clearSearch() { document.getElementById('searchInput').value = ''; loadTransactions(); }
 
-    function searchTransactions() {
-        const term = document.getElementById('searchInput').value.trim();
-        if (!term) {
-            loadTransactions();
-            return;
-        }
-        loadTransactions(term);
-    }
-
-    function clearSearch() {
-        document.getElementById('searchInput').value = '';
-        loadTransactions();
-    }
-
-    // ========== RENDERIZAR TABELA ==========
-    function renderTable(transactions) {
-        const tbody = document.querySelector('#txTable tbody');
+    function renderList(transactions) {
+        const container = document.getElementById('txList');
         const noResults = document.getElementById('noResults');
-        tbody.innerHTML = '';
+        container.innerHTML = '';
 
         if (!transactions || transactions.length === 0) {
             noResults.style.display = 'block';
             return;
         }
-
         noResults.style.display = 'none';
 
         transactions.forEach(tx => {
             const date = new Date(tx.createdAt).toLocaleString('pt-BR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
+                day: '2-digit', month: '2-digit', year: '2-digit',
+                hour: '2-digit', minute: '2-digit'
             });
-
             const isDeposit = tx.type === 'deposit';
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${date}</td>
-                <td>${tx.username || '-'}</td>
-                <td>${tx.telegramId}</td>
-                <td style="color:${isDeposit ? '#5a9c3f' : '#e0434f'}">${isDeposit ? '📥 Depósito' : '💸 Saque'}</td>
-                <td style="color:var(--gold)">${tx.amount.toFixed(2)} GRAM</td>
-                <td style="font-size:0.4rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;">${tx.txHash || tx.walletAddress || '-'}</td>
-                <td class="status ${tx.status}">${tx.status === 'pending' ? '⏳ Pendente' : tx.status}</td>
-                <td class="actions">
-                    <button onclick="processTx('${tx._id}', 'approved')" class="green">✅ Aprovar</button>
-                    <button onclick="processTx('${tx._id}', 'rejected')">❌ Rejeitar</button>
-                </td>
-            `;
-            tbody.appendChild(row);
+
+            const card = document.createElement('div');
+            card.className = 'tx-card';
+
+            let html = `<div class="tx-header">`;
+            html += `<span>${date}</span>`;
+            html += `<span class="status ${tx.status}">${tx.status === 'pending' ? '⏳ Pendente' : tx.status}</span>`;
+            html += `</div>`;
+
+            html += `<div class="tx-row"><span class="tx-label">Jogador:</span><span class="tx-value">${tx.username || '-'} (ID: ${tx.telegramId})</span></div>`;
+            html += `<div class="tx-row"><span class="tx-label">Tipo:</span><span class="tx-value" style="color:${isDeposit ? '#5a9c3f' : '#e0434f'}">${isDeposit ? '📥 Depósito' : '💸 Saque'}</span></div>`;
+            html += `<div class="tx-row"><span class="tx-label">Valor:</span><span class="tx-value" style="color:#ffd700;">${tx.amount.toFixed(2)} GRAM</span></div>`;
+
+            if (isDeposit && tx.txHash) {
+                html += `<div class="tx-label" style="margin-top:6px;">Hash da Transação:</div>`;
+                html += `<div class="tx-hash">${tx.txHash}</div>`;
+                html += `<div style="font-size:0.35rem;margin-top:2px;"><a href="https://tonscan.org/tx/${tx.txHash}" target="_blank" style="color:#aaccff;">🔗 Ver no explorer</a></div>`;
+            }
+
+            if (!isDeposit && tx.walletAddress) {
+                html += `<div class="tx-row"><span class="tx-label">Carteira destino:</span><span class="tx-value" style="word-break:break-all;">${tx.walletAddress}</span></div>`;
+            }
+
+            if (tx.fee) {
+                html += `<div class="tx-row"><span class="tx-label">Taxa:</span><span class="tx-value">${tx.fee.toFixed(2)} GRAM</span></div>`;
+            }
+
+            html += `<div class="actions">`;
+            html += `<button onclick="processTx('${tx._id}', 'approved')" class="green">✅ Aprovar</button>`;
+            html += `<button onclick="processTx('${tx._id}', 'rejected')">❌ Rejeitar</button>`;
+            html += `</div>`;
+
+            card.innerHTML = html;
+            container.appendChild(card);
         });
     }
 
-    // ========== PROCESSAR TRANSAÇÃO ==========
     async function processTx(id, status) {
         const action = status === 'approved' ? 'APROVAR' : 'REJEITAR';
         if (!confirm(`⚠️ Confirmar ${action} esta transação?`)) return;
-
         try {
             const res = await fetch(`${API_URL}/api/admin/transaction/${id}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
                 body: JSON.stringify({ status })
             });
-
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Erro ao processar');
-
-            alert(`✅ Transação ${status === 'approved' ? 'aprovada' : 'rejeitada'} com sucesso!`);
-
+            alert(`✅ Transação ${status === 'approved' ? 'aprovada' : 'rejeitada'}!`);
             const searchTerm = document.getElementById('searchInput').value.trim();
             loadTransactions(searchTerm);
-
-        } catch (e) {
-            alert('❌ ' + e.message);
-        }
+        } catch (e) { alert('❌ ' + e.message); }
     }
 
-    // ========== VERIFICA LOGIN AO CARREGAR ==========
     window.addEventListener('load', () => {
         if (authToken) {
-            // Testa se o token ainda é válido fazendo uma requisição silenciosa
-            fetch(`${API_URL}/api/admin/transactions`, {
-                headers: { 'Authorization': `Bearer ${authToken}` }
-            }).then(res => {
+            fetch(`${API_URL}/api/admin/transactions`, { headers: { 'Authorization': `Bearer ${authToken}` } })
+            .then(res => {
                 if (res.ok) {
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('panel').style.display = 'block';
                     loadTransactions();
-                } else {
-                    // Token inválido ou expirado
-                    logout();
-                }
+                } else { logout(); }
             }).catch(() => {
-                // Erro de rede, mantém logado mas pode falhar depois
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('panel').style.display = 'block';
                 loadTransactions();
